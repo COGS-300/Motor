@@ -71,3 +71,21 @@
      return pwmSpeed;
  }
  
+ /**
+ * @brief Runs the motor at the specified speed and direction.
+ * 
+ * This function sets both the direction and speed of the motor based on the 
+ * sign and magnitude of the input value. A positive speed runs the motor 
+ * forward, a negative speed runs it backward, and zero stops the motor.
+ * 
+ * @param speed A float between -1.0 and 1.0 representing the desired speed and direction.
+ *              Positive values run the motor forward, negative values backward.
+ */
+ void Motor::run(float speed) {
+    if (speed > 0) {
+      setDirection(FORWARD);
+    } else {
+      setDirection(BACKWARD);
+    }
+    setSpeed(speed);
+  }
