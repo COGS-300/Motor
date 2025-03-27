@@ -21,6 +21,9 @@
        int dirPin;    ///< Digital pin for motor direction control
        int speedPin;  ///< PWM pin for motor speed control
        bool inverted; ///< Flag to determine if speed values should be inverted
+       bool reversed; ///< Flag to determine if direction should be reversed
+       bool debug;    ///< Flag to print debug info.
+       char label;
    
      public:
        /**
@@ -39,9 +42,11 @@
         * @brief Constructor to initialize the motor.
         * @param dir_pin The pin connected to the direction control input of the motor driver.
         * @param speed_pin The pin connected to the PWM input of the motor driver.
-        * @param invert If true, inverts the speed value to reverse motor control behavior.
+        * @param reversed If true, inverts the direction value to reverse motor control behavior (forward is backward and backward is forward).
+        * @param debug If true, prints all debug info.
+        * @param label A character label for the motor.
         */
-       Motor(int dir_pin, int speed_pin, bool invert);
+       Motor(int dir_pin, int speed_pin, bool reversed, bool debug, char label);
        
        /**
         * @brief Sets the motor direction.

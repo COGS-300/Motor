@@ -17,10 +17,27 @@
   * 
   * @param dir_pin The pin connected to the direction control input of the motor driver.
   * @param speed_pin The pin connected to the PWM input of the motor driver.
-  * @param invert If true, inverts the speed value to reverse motor control behavior (default: false).
+  * @param reversed If true, reverses the direction value to reverse motor control behavior (default: false).
+  * @param debug If true, prints all debug info.
+  * @param label Character label for the motor.
   */
- Motor::Motor(int dir_pin, int speed_pin, bool invert) : dirPin(dir_pin), speedPin(speed_pin), inverted(invert)
+ Motor::Motor(
+  int dir_pin, 
+  int speed_pin, 
+  bool reversed, 
+  bool debug, 
+  char label) : 
+      dirPin(dir_pin),
+      speedPin(speed_pin),
+      reversed(reversed),
+      debug(debug),
+      label(label)
  {
+    if (debug) {
+      char buffer[150];
+      sprintf(buffer, "Setting motor %c to pin %d for direction and pin %d for speed.", label, dirPin, speedPin);
+      Serial.println(buffer);
+    }
      pinMode(dirPin, OUTPUT);
      pinMode(speedPin, OUTPUT);
  }
@@ -34,8 +51,8 @@
   * @param direction Use Motor::FORWARD or Motor::BACKWARD to set the direction.
   */
  void Motor::setDirection(bool direction)
- {
-     digitalWrite(dirPin, direction);
+ {    
+    digitalWrite(dirPin, direction);
  }
  
  /**
@@ -47,26 +64,9 @@
   * @param normalizedSpeed A float between 0.0 and 1.0 representing the desired motor speed.
   * @return The actual PWM value set (between 0 and 255).
   */
- int Motor::setSpeed(float normalizedSpeed)
+ int Motor::setSpeed(float speed)
  {
-     // Ensure speed is within the valid range
-     if (normalizedSpeed <= MIN_SPEED)
-     {
-         normalizedSpeed = 0;
-     }
-     normalizedSpeed = constrain(normalizedSpeed, 0.0, 1.0);
- 
-     // Invert speed if necessary
-     if (inverted)
-     {
-         normalizedSpeed = 1.0 - normalizedSpeed;
-     }
- 
-     Serial.print("Normalized speed: ");
-     Serial.println(normalizedSpeed);
- 
-     // Convert normalized speed to PWM range (0-255)
-     int pwmSpeed = int(trunc(normalizedSpeed * MAX_SPEED));
+     int pwmSpeed = int(trunc(speed * MAX_SPEED));
      analogWrite(speedPin, pwmSpeed);
      return pwmSpeed;
  }
@@ -82,10 +82,31 @@
  *              Positive values run the motor forward, negative values backward.
  */
  void Motor::run(float speed) {
-    if (speed > 0) {
-      setDirection(FORWARD);
-    } else {
-      setDirection(BACKWARD);
-    }
+  int dir = FORWARD;
+  if (speed < 0) {
+    dir = !dir;
+  }
+  if (reversed) {
+    dir = !dir;
+  }
+
+  // Put everything into the right range
+  speed = abs(constrain(speed, -1.0, 1.0));
+
+  if (dir == FORWARD) {
+    setDirection(FORWARD);
+    setSpeed(1.0 - speed);
+  } else {
+    setDirection(BACKWARD);
     setSpeed(speed);
   }
+    
+    // Debugging
+    if (debug) {
+      char buffer[150];
+      char floatStr[10];
+      dtostrf(speed, 5, 2, floatStr);
+      sprintf(buffer, "Set speed to %s and direction %d for motor %c.", floatStr, dir, label);
+      Serial.println(buffer);
+    }
+}
