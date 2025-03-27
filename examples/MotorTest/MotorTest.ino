@@ -5,6 +5,7 @@
  */
 
 #include <Motor.h> // Include custom Motor control library
+#include "config.h"
 
 // Define motor control pins
 #define MOTOR_A_DIR 8     // Direction pin for Motor A
@@ -24,7 +25,7 @@ Motor motorB(MOTOR_B_DIR, MOTOR_B_SPEED, false, true, 'B');
 
 void setup() {
   // Initialize Serial communication for debugging
-  Serial.begin(9600);
+  Serial.begin(ROBOT_BAUD_RATE);
   Serial.println("\n\n\n=================================");
   Serial.println("Motor test starting.");
 }
