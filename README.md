@@ -15,7 +15,7 @@ Copy `Motor.h` and `Motor.cpp` into your Arduino project directory.
 
 ### Include the Library
 ```cpp
-#include "Motor.h"
+#include <Motor.h>
 ```
 
 ### Initialize the Motor
